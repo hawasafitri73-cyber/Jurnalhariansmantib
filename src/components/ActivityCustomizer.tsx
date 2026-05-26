@@ -137,6 +137,8 @@ export default function ActivityCustomizer({ activities, onChange, onReset }: Ac
               <option value="3. Menilai Hasil Pembelajaran atau Pembimbingan">3. Menilai Hasil Pembelajaran atau Pembimbingan</option>
               <option value="4. Membimbing dan Melatih Murid">4. Membimbing dan Melatih Murid</option>
               <option value="5. Melaksanakan Tugas Tambahan">5. Melaksanakan Tugas Tambahan</option>
+              <option value="6. Kehadiran ASN Guru">6. Kehadiran ASN Guru</option>
+<option value="7. Pelaksanaan Tugas BK">7. Pelaksanaan Tugas BK</option>
             </select>
           </div>
 
