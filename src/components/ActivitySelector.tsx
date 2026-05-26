@@ -9,7 +9,6 @@ interface ActivitySelectorProps {
 
 export default function ActivitySelector({ activities, onChange }: ActivitySelectorProps) {
   
-  // High performance compression using HTML Canvas
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -41,7 +40,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Downscaling quality to 0.65 for outstanding disk/base64 space compression with good print clarity
           const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
           resolve(compressedBase64);
         };
@@ -58,8 +56,8 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
         return {
           ...act,
           isActive: nextState,
-          duration: nextState ? (act.duration || 1) : 0, // Default to 1 hour if checked
-          photos: nextState ? act.photos : [], // Discard photos if unchecked
+          duration: nextState ? (act.duration || 1) : 0,
+          photos: nextState ? act.photos : [],
           photoCaptions: nextState ? act.photoCaptions : [],
         };
       }
@@ -100,7 +98,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
       try {
         const base64 = await compressImage(file);
         newPhotos.push(base64);
-        // Default caption index reference
         const photoNum = act.photos.length + newPhotos.length;
         newCaptions.push(`Foto ${photoNum}: Dokumentasi ${act.activityName.substring(0, 35)}...`);
       } catch (err: any) {
@@ -129,7 +126,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
         newPhotos.splice(photoIdx, 1);
         newCaptions.splice(photoIdx, 1);
         
-        // Relabel photo numbers in captions to keep them sequential
         const refitCaptions = newCaptions.map((cap, idx) => {
           if (cap.startsWith('Foto ')) {
             return `Foto ${idx + 1}:${cap.substring(cap.indexOf(':') + 1)}`;
@@ -148,31 +144,24 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
     onChange(updated);
   };
 
-  const handleCaptionChange = (id: string, photoIdx: number, newCap: string) => {
-    const updated = activities.map((act) => {
-      if (act.id === id) {
-        const nextCaptions = [...act.photoCaptions];
-        nextCaptions[photoIdx] = newCap;
-        return {
-          ...act,
-          photoCaptions: nextCaptions,
-        };
-      }
-      return act;
-    });
-    onChange(updated);
-  };
+  // ==================================================
+  // DAFTAR 7 KOMPONEN - SUDAH LENGKAP
+  // ==================================================
+  const componentsList = [
+    "1. Merencanakan Pembelajaran atau Pembimbingan",
+    "2. Melaksanakan Pembelajaran atau Pembimbingan",
+    "3. Menilai Hasil Pembelajaran atau Pembimbingan",
+    "4. Membimbing dan Melatih Murid",
+    "5. Melaksanakan Tugas Tambahan",
+    "6. Kehadiran ASN Guru",
+    "7. Pelaksanaan Tugas BK",
+  ];
 
-  // Group activities by component
-  const componentsList = Array.from(new Set(activities.map((a) => a.component)));
-
-  // Global counts for easy tracking
   const totalHours = activities.reduce((sum, a) => sum + (a.isActive ? a.duration : 0), 0);
   const totalSelected = activities.filter((a) => a.isActive).length;
 
   return (
     <div className="space-y-4">
-      {/* Overview stats badge */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-between items-center text-xs text-slate-600">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 bg-sky-500 rounded-full animate-pulse"></span>
@@ -190,7 +179,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
         </div>
       </div>
 
-      {/* Accordion / Tab structure for components */}
       <div className="space-y-4">
         {componentsList.map((comp, compIdx) => {
           const compActivities = activities.filter((a) => a.component === comp);
@@ -213,8 +201,12 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
               </div>
 
               <div className="divide-y divide-slate-100">
-                {compActivities.map((act) => {
-                  return (
+                {compActivities.length === 0 ? (
+                  <div className="p-4 text-center text-slate-400 text-xs">
+                    Belum ada kegiatan. Silakan tambah di menu Template.
+                  </div>
+                ) : (
+                  compActivities.map((act) => (
                     <div
                       key={act.id}
                       className={`p-4 transition-all duration-200 ${
@@ -222,7 +214,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        {/* Checkbox */}
                         <button
                           onClick={() => handleToggleActive(act.id)}
                           className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-all cursor-pointer ${
@@ -235,7 +226,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                         </button>
 
                         <div className="flex-1 min-w-0">
-                          {/* Label info */}
                           <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-[10px] font-extrabold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
                               No. {act.no}
@@ -250,12 +240,9 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                             {act.activityName}
                           </p>
 
-                          {/* Extended Section for Active activities */}
                           {act.isActive && (
                             <div className="mt-3.5 pt-3 border-t border-slate-150 space-y-4 animate-fade-in text-xs">
-                              {/* Duration Input */}
                               <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100">
-                                {/* Akumulasi Jam Counter */}
                                 <div className="space-y-1">
                                   <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">
                                     Akumulasi Jam Kerja (Jam Kinerja)
@@ -266,7 +253,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                                         type="button"
                                         onClick={() => handleDurationChange(act.id, Math.max(0, act.duration - 0.25))}
                                         className="px-2.5 h-full text-slate-505 hover:bg-slate-50 font-bold border-r border-slate-200 cursor-pointer flex items-center justify-center text-sm"
-                                        title="Kurangi 0,25 Jam"
                                       >
                                         -
                                       </button>
@@ -276,14 +262,13 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                                         step="0.25"
                                         min="0"
                                         onChange={(e) => handleDurationChange(act.id, parseFloat(e.target.value) || 0)}
-                                        className="w-12 h-full text-center text-xs font-bold text-slate-700 bg-transparent focus:outline-none focus:ring-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        className="w-12 h-full text-center text-xs font-bold text-slate-700 bg-transparent focus:outline-none focus:ring-0 select-all"
                                         placeholder="0"
                                       />
                                       <button
                                         type="button"
                                         onClick={() => handleDurationChange(act.id, act.duration + 0.25)}
                                         className="px-2.5 h-full text-slate-505 hover:bg-slate-50 font-bold border-l border-slate-200 cursor-pointer flex items-center justify-center text-sm"
-                                        title="Tambah 0,25 Jam"
                                       >
                                         +
                                       </button>
@@ -319,7 +304,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                                 </div>
                               </div>
 
-                              {/* Photo Uploader Section */}
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <label className="text-xs font-semibold text-slate-500 flex items-center gap-1">
@@ -331,7 +315,6 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                                   </span>
                                 </div>
 
-                                {/* Upload drop container */}
                                 {act.photos.length < 10 && (
                                   <div className="border border-dashed border-slate-200 rounded-lg hover:border-sky-500 bg-white hover:bg-sky-50/10 transition-colors p-3.5 text-center cursor-pointer relative group">
                                     <input
@@ -353,37 +336,30 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                                   </div>
                                 )}
 
-                                {/* Thumbnail previews and Caption Inputs */}
                                 {act.photos.length > 0 && (
                                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pt-1">
-                                    {act.photos.map((photo, pIdx) => {
-                                      return (
-                                        <div
-                                          key={pIdx}
-                                          className="flex flex-col border border-slate-200 bg-slate-50 rounded-lg overflow-hidden relative group shadow-2xs"
+                                    {act.photos.map((photo, pIdx) => (
+                                      <div
+                                        key={pIdx}
+                                        className="flex flex-col border border-slate-200 bg-slate-50 rounded-lg overflow-hidden relative group shadow-2xs"
+                                      >
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemovePhoto(act.id, pIdx)}
+                                          className="absolute top-1 right-1 bg-red-600/95 hover:bg-red-700 text-white rounded-full p-1 opacity-90 group-hover:opacity-100 transition-opacity shadow-xs z-10"
                                         >
-                                          {/* Delete overlay */}
-                                          <button
-                                            type="button"
-                                            onClick={() => handleRemovePhoto(act.id, pIdx)}
-                                            className="absolute top-1 right-1 bg-red-600/95 hover:bg-red-700 text-white rounded-full p-1 opacity-90 group-hover:opacity-100 transition-opacity shadow-xs z-10"
-                                            title="Hapus foto"
-                                          >
-                                            <X className="w-3.5 h-3.5" />
-                                          </button>
-
-                                          {/* Embedded compressed image */}
-                                          <div className="h-28 w-full bg-slate-100 flex items-center justify-center overflow-hidden">
-                                            <img
-                                              src={photo}
-                                              alt={`Bukti ${pIdx + 1}`}
-                                              referrerPolicy="no-referrer"
-                                              className="h-full w-full object-cover"
-                                            />
-                                          </div>
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                        <div className="h-28 w-full bg-slate-100 flex items-center justify-center overflow-hidden">
+                                          <img
+                                            src={photo}
+                                            alt={`Bukti ${pIdx + 1}`}
+                                            referrerPolicy="no-referrer"
+                                            className="h-full w-full object-cover"
+                                          />
                                         </div>
-                                      );
-                                    })}
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </div>
@@ -392,8 +368,8 @@ export default function ActivitySelector({ activities, onChange }: ActivitySelec
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                  ))
+                )}
               </div>
             </div>
           );
