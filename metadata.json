@@ -1,0 +1,6 @@
+{
+  "name": "Laporan Harian Kegiatan Guru",
+  "description": "Generator laporan harian kegiatan guru interaktif dengan penyusunan otomatis kisi lampiran foto dokumentasi siap cetak PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
